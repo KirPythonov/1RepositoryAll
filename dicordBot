@@ -1,0 +1,34 @@
+import discord
+from discord.ext import commands
+import datetime
+client = commands.Bot( command_prefix ='!' )
+
+@client.event
+
+async def on_ready():
+	print( 'Bot connected' )
+
+@client.command( pass_context = True )
+
+async def clear( ctx, amount = 100 ):
+	await ctx.channel.purge( limit = amount )
+
+@client.command( pass_context = True )
+async def hello( ctx ):
+	author = ctx.message.author
+
+	await ctx.send( f' { author.mention } Hello, I am bot for Discord \nЕсть такие комманды:\n!clear - после "!clear" укажите кол-во сообщений, которое нужно удалить\n!hello\n!time (P.S - не спрашивайте нахуя)\n  🐍Сreated by Pashtet🐍 ' )
+
+@client.command(pass_context = True )
+@commands.has_permissions( administrator = True )
+
+async def ban( ctx, member: discord.Member, * , reason = None ):
+	emb = discord.Embed( title = 'Участник канала был забанен', colour = discord.Color.red() )
+	await ctx.channel.purge( limit = 1 )
+	await member.ban( reason = reason )
+	emb.set_author( name = member.name, icon_url = member.avatar_url )
+	emb.add_field(name = 'Ban user', value = 'Banned user : {}'.format( member.mention ) )
+	emb.set_footer( text = 'Был забанен администратором {}'.format( ctx.author.name ), icon_url = ctx.author.avatar_url )
+	await ctx.send( embed = emb )
+
+client.run('ODY2NjgzNjY3MzU1MTQwMDk2.YPWIEA.JQifw2-YRUfkvdhrA5R1OPdUgI8')
