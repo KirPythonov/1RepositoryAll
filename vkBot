@@ -1,0 +1,218 @@
+import vk_api
+import time
+import random
+import pyowm
+import json
+
+owm = pyowm.OWM('6d00d1d4e704068d70191bad2673e0cc', language="ru")
+
+place = "Тула"
+
+observation = owm.weather_at_place(place)
+
+w = observation.get_weather()
+
+temp = w.get_temperature('celsius')['temp']
+
+wt = w.get_detailed_status()
+
+if wt == "ясно":
+    k = "☀"
+    l = "☀"
+elif wt == "пасмурно":
+    k = "🌥"
+    l = "🌥"
+elif wt == "небольшой дождь":
+    k = "🌧"
+    l = "☂"
+elif wt == "мгла":
+    k = "🌫"
+    l = "🌫"
+elif wt == "небольшой снегопад":
+    k = "🌨"
+    l = "🌨"
+elif wt == "переменная облачность":
+    k = "🌤"
+    l = "🌤"
+elif wt == "облачно с прояснениями":
+    k = "🌤"
+    l = "🌤"
+elif wt == "небольшой снег":
+    k = "❄"
+    l = "❄"
+
+if 0 < temp < 5:
+    f = "Холодновато, но жить можно"
+elif temp < 0:
+    f = "❄Сегдня не самый лучший день чтобы куда-то выходить⛄"
+elif 12 > temp > 5:
+    f = "Сегодня можно и окно открыть"
+else:
+    f = "🔥Очинь тепло🔥"
+
+token = "1a04ad619f7f7426fadb651cd0480819a6604b0dc4653ae25beda435146db7fb10088f3396cf25698ae0c"
+
+vk = vk_api.VkApi(token=token)
+vk._auth_token()
+
+
+def get_button(label, color, payload=""):
+    return {
+        "action": {
+            "type": "text",
+            "payload": json.dumps(payload),
+            "label": label
+        },
+        "color": color
+    }
+
+
+keyboard = {
+    "one_time": False,
+    "buttons": [
+        [get_button(label="это главное меню", color="default")],
+        [get_button(label="погода", color="primary"), get_button(label="✅дальше✅", color="positive")],  # МЕЙН МЕНЮ
+        [get_button(label="✅сквад96✅", color="primary"), ]
+    ]
+}
+
+keyboard = json.dumps(keyboard, ensure_ascii=False).encode('utf-8')
+keyboard = str(keyboard.decode('utf-8'))
+
+keyboardd = {
+    "one_time": False,
+    "buttons": [
+        [get_button(label="⛔в главное меню⛔", color="negative"), get_button(label="пук", color="primary")],
+        # ВТОРОЕ МЕНЮ
+        [get_button(label="кто я?", color="primary"), get_button(label="привет лунтик", color="primary"),
+         get_button(label="где я?", color="primary")],
+        [get_button(label="ку", color="primary"), get_button(label="привет", color="default"),
+         get_button(label="жопа", color="primary")]
+    ]
+}
+
+keyboardd = json.dumps(keyboardd, ensure_ascii=False).encode('utf-8')
+keyboardd = str(keyboardd.decode('utf-8'))
+
+keyboarddd = {
+    "one_time": False,
+    "buttons": [
+        [get_button(label="🔥список админов🔥", color="primary"), get_button(label="✅дальше✅", color="positive")],
+        # СКВАД96 ГРУППА
+        [get_button(label="🔔комманды бота🔔", color="primary"),
+         get_button(label="💬полезные ссылки💬", color="primary")]
+    ]
+}
+
+keyboarddd = json.dumps(keyboarddd, ensure_ascii=False).encode('utf-8')
+keyboarddd = str(keyboarddd.decode('utf-8'))
+
+while True:
+    try:
+        messages = vk.method("messages.getConversations", {"offset": 0, "count": 20, "filter": "unanswered"})
+        if messages["count"] >= 1:
+            id = messages["items"][0]["last_message"]["from_id"]
+            body = messages["items"][0]["last_message"]["text"]
+            if body.lower() == "привет лунтик":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Ну здарова маслёнок, надеюсь лайки на посты ставишь,иначе мне придётся тебя ударить",
+                                            "random_id": random.randint(1, 2147483647)})
+            elif body.lower() == "кто я?":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Ты участник группы Сквад96, если тебе хочеца немнога рофла, тогда тебе к нам <3",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "ку":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "КУ КУ дурак, чё ты как бешенный разровариваешь, пиши как нормальный человек, а не кукарекай",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "жопа":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Какой ответ ты ожидал получить??? твой уровень IQ явно сравним с табуреткой",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "как дела?":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Отлично, я развиваюсь и становлюсь лучше и умнее день за днём\n А у тебя как дела? =)",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "привет":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Привет случайный жоджориан, меня зовут БОТлунтик и я могу показать погоду, список админов и ещё много чего, поэтому оставайся со мной и не забывай лайкать посты в группе ",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "ты даун":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Заткнись, жертва инцеста. Тебе повезло, что твоя мать забрала тебя из детдома, сучёнок",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            # elif body.lower() == "🌧погода☀":
+            # vk.method("messages.send", {"peer_id": id, "message": "Сегодня погода в Туле: " + k + str(wt) + l + "\n" + "Средняя температура равна: " + str(temp) + "градусам \n" + f, "random_id": random.randint(1, 2147483647)})
+            elif body.lower() == "погода":
+                vk.method("messages.send", {"peer_id": id, "message": "Сегодня погода в Туле: " + k + str(
+                    wt) + l + "\n" + "Средняя температура равна: " + str(temp) + "градусам \n" + f,
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "пук":
+                vk.method("messages.send",
+                          {"peer_id": id, "message": "🗯Пукнул🗯", "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "иди нахуй":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Иди нахуй ты сука ванючий калл из жопы ты обрыганый олень сука гей деньчик половой синдром патау додик ",
+                                            "random_id": random.randint(1, 2147483647)})
+            elif body.lower() == "пошёл на хуй":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Пошёл на хуй сам ты сука ванючий калл из жопы ты обрыганый олень сука гей деньчик половой синдром патау додик падаль гниль",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "хуй":
+                vk.method("messages.send", {"peer_id": id, "message": "Те делать нечего? иди займись делом",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "это главное меню":
+                vk.method("messages.send",
+                          {"peer_id": id, "message": "Поздравляем, вы ничего не получили, попробуйте снова позже",
+                           "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "где я?":
+                vk.method("messages.send", {"peer_id": id, "message": "Ты в интернете, передай привет РОСКОМНАДЗОРУ!",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "💬полезные ссылки💬":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Тут могла быть твоя реклама, но к сожалению у тебя нет деняк (-_-)\n также ты можешь на досуге посмотреть JOJO - https://jut.su/jojo-bizarre-adventure",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "🔔комманды бота🔔":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "| привет лунтик | кто я? | как дела? | пук | где я? | \n |  ку | погода | 💬полезные ссылки💬| \n | 🔔комманды бота🔔 | 🔥список админов🔥 |\n ""На этом комманды не заканчиваются, ты всё ещё можешь послать бота если тебе вдруг захотелось",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "🔥список админов🔥":
+                vk.method("messages.send", {"peer_id": id,
+                                            "message": "Саня-главный администратор🐔\n Деньчик-модератор(чисто рофл)🤡\n Никита Баранов-редактор😎\n Кирилл Гуськов-создатель бота😎\n Лена Пакидова-администратор🔥\n Вован Гуськов-редактор😎",
+                                            "random_id": random.randint(1, 2147483647)})
+            elif body.lower() == "начать":
+                vk.method("messages.send", {"peer_id": id, "keyboard": keyboard, "message": "ЧИК-БЗДЫК",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "✅дальше✅":
+                vk.method("messages.send", {"peer_id": id, "keyboard": keyboardd, "message": "ЧИК-БЗДЫК",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "✅сквад96✅":
+                vk.method("messages.send", {"peer_id": id, "keyboard": keyboarddd, "message": "ЧИК-БЗДЫК",
+                                            "random_id": random.randint(1, 2147483647)})
+
+            elif body.lower() == "⛔в главное меню⛔":
+                vk.method("messages.send", {"peer_id": id, "keyboard": keyboard, "message": "ЧИК-БЗДЫК",
+                                            "random_id": random.randint(1, 2147483647)})
+    except Exception as E:
+        time.sleep(1)
+
+        # ЭТО ЗАПУСК КОДА забыл наверное как эту дуру запускать, да? -->
+
+        # cd C:\bot
+        # python vk.py
